@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:cashwalk/widgets/lucky_lottery.dart';
 
 class ChatBubble extends StatelessWidget {
   final Map<String, dynamic> msg;
-  final bool isMe; // 메시지 위치용
+  final bool isMe;
   final int? myUserId;
   final void Function(String messageId, int reward) onRedeem;
-
-  // ✅ 다이얼로그 실행용 콜백
   final VoidCallback? onLuckyCashTap;
 
   const ChatBubble({
@@ -58,13 +55,18 @@ class ChatBubble extends StatelessWidget {
 
   Widget _buildLuckyCash(BuildContext context) {
     final isSender = msg['senderId'] == myUserId;
+
+    // ✅ createdAt 기반 로컬 만료 보정
+    final createdAtStr = msg['createdAt'];
+    final createdAt = DateTime.tryParse(createdAtStr ?? '')?.toLocal();
+    final isActuallyExpired = createdAt == null
+        ? false
+        : DateTime.now().difference(createdAt).inHours >= 24;
+
+    final expired = msg['expired'] == true || isActuallyExpired;
     final opened = msg['opened'] == true;
-    final expired = msg['expired'] == true;
-    final createdAt = msg['createdAt'];
-    final remainingText = _formatRemainingTime(createdAt);
 
     if (isSender) {
-      // 🎁 보낸 사용자용 메시지
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -80,17 +82,17 @@ class ChatBubble extends StatelessWidget {
           else
             const Text('아직 선물을 열지 않았어요.',
                 style: TextStyle(color: Colors.orange)),
-          const SizedBox(height: 4),
-          Text('⏰ $remainingText',
-              style: const TextStyle(fontSize: 12, color: Colors.grey)),
         ],
       );
     } else {
-      // 🎁 받은 사용자용 메시지
       if (opened) {
         return Column(
           children: [
-            Image.asset('assets/images/lucky_received.png', height: 100),
+            Image.asset('assets/images/lucky_received.png',
+              height: 200,
+              width: double.infinity, // 👉 가로 꽉 차게
+              fit: BoxFit.cover,
+            ),
             const SizedBox(height: 12),
             const Text('행운 캐시를 받으세요!',
                 style: TextStyle(fontWeight: FontWeight.bold)),
@@ -109,7 +111,10 @@ class ChatBubble extends StatelessWidget {
       } else if (expired) {
         return Column(
           children: [
-            Image.asset('assets/images/lucky_expired.png', height: 100),
+            Image.asset('assets/images/lucky_expired.png',
+              height: 200,
+              width: double.infinity, // 👉 가로 꽉 차게
+              fit: BoxFit.cover,),
             const SizedBox(height: 12),
             const Text('행운 캐시를 받지 못했어요.',
                 style: TextStyle(fontWeight: FontWeight.bold)),
@@ -145,17 +150,6 @@ class ChatBubble extends StatelessWidget {
             const Text('행운 캐시를 받으세요!',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             const Text('유효 시간이 끝나기 전에 친구의 선물을 받아보세요.'),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(Icons.timer, size: 18, color: Colors.grey),
-                const SizedBox(width: 4),
-                Text(
-                  remainingText,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              ],
-            ),
             const SizedBox(height: 12),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -164,39 +158,24 @@ class ChatBubble extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8)),
               ),
-              onPressed: () {
+              onPressed: (!expired && !opened)
+                  ? () {
                 if (onLuckyCashTap != null) {
                   onLuckyCashTap!();
                 }
-              },
-              child: const Text('친구의 선물 받기'),
+              }
+                  : null,
+              child: Text(
+                expired
+                    ? '⏰ 만료됨'
+                    : opened
+                    ? '받기 완료'
+                    : '친구의 선물 받기',
+              ),
             ),
           ],
         );
       }
-    }
-  }
-
-  String _formatRemainingTime(String? createdAtStr) {
-    if (createdAtStr == null) return '유효시간 계산불가';
-
-    try {
-      final createdAt = DateTime.parse(createdAtStr).toLocal();
-      final now = DateTime.now();
-      final passed = now.difference(createdAt);
-      final remaining = Duration(hours: 24) - passed;
-
-      if (remaining.isNegative) return '만료됨';
-
-      final hours = remaining.inHours;
-      final minutes = remaining.inMinutes % 60;
-      final seconds = remaining.inSeconds % 60;
-
-      return '${hours.toString().padLeft(2, '0')}시간 '
-          '${minutes.toString().padLeft(2, '0')}분 '
-          '${seconds.toString().padLeft(2, '0')}초';
-    } catch (e) {
-      return '유효시간 계산 오류';
     }
   }
 

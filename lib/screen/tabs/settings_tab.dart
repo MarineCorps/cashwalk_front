@@ -57,7 +57,7 @@ class _SettingsTabState extends State<SettingsTab> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) =>ProfileSetting()),
+                MaterialPageRoute(builder: (_) =>ProfileSettingPage()),
               );
             },
           ),

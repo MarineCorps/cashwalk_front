@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 import 'package:cashwalk/services/community_service.dart';
@@ -13,8 +15,9 @@ class WritePostPage extends StatefulWidget {
 class _WritePostPageState extends State<WritePostPage> {
   final _titleController = TextEditingController();
   final quill.QuillController _quillController = quill.QuillController.basic();
+  final ImagePicker _picker = ImagePicker();
+  XFile? _selectedImage;
 
-  // ✅ 게시판 매핑 (UI 이름 → 백엔드 ENUM 값)
   final Map<String, String> _boardMap = {
     '캐시톡 친구 추가 모집': 'FRIEND_RECRUIT',
     '게시판 오픈 신청': 'BOARD_OPEN_REQUEST',
@@ -24,12 +27,21 @@ class _WritePostPageState extends State<WritePostPage> {
     '질문답변': 'QNA',
   };
 
-  String _selectedBoard = '자유/일상'; // 기본 선택
-  final String _defaultPostCategory = 'GENERAL'; // ✅ 현재는 고정
-
+  String _selectedBoard = '자유/일상';
+  final String _defaultPostCategory = 'GENERAL';
   bool _isSubmitting = false;
 
-  /// ✅ 게시글 제출 처리
+  /// ✅ 이미지 선택
+  Future<void> _pickImage() async {
+    final image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _selectedImage = image;
+      });
+    }
+  }
+
+  /// ✅ 게시글 작성 제출
   Future<void> _submitPost() async {
     final title = _titleController.text.trim();
     final content = _quillController.document.toPlainText().trim();
@@ -48,11 +60,12 @@ class _WritePostPageState extends State<WritePostPage> {
         title: title,
         content: content,
         boardType: _boardMap[_selectedBoard]!,
-        postCategory: _defaultPostCategory, // ✅ 고정된 카테고리 사용
+        postCategory: _defaultPostCategory,
+        image: _selectedImage,
       );
 
       if (mounted) {
-        Navigator.pop(context, true); // 작성 완료 후 페이지 닫기
+        Navigator.pop(context, true);
       }
     } catch (e) {
       setState(() => _isSubmitting = false);
@@ -149,6 +162,38 @@ class _WritePostPageState extends State<WritePostPage> {
                             ),
                           ),
                         ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // ✅ 이미지 미리보기
+                    if (_selectedImage != null)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('첨부된 이미지', style: TextStyle(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 8),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.file(
+                              File(_selectedImage!.path),
+                              height: 180,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+                      ),
+
+                    // ✅ 이미지 첨부 버튼
+                    ElevatedButton.icon(
+                      onPressed: _pickImage,
+                      icon: const Icon(Icons.image),
+                      label: const Text('이미지 첨부'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[200],
+                        foregroundColor: Colors.black,
                       ),
                     ),
 

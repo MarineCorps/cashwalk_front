@@ -49,6 +49,8 @@ dependencies:
   # ✅ 푸시 / 알림
   firebase_core: ^2.27.0
   firebase_messaging: ^14.7.1
+  flutter_local_notifications: ^19.1.2
+  flutter_tts: ^3.8.3
 
   # ✅ 보안 및 권한
   flutter_secure_storage: ^9.0.0
@@ -86,10 +88,29 @@ dependencies:
   http_parser: ^4.0.2
   lottie: ^2.2.0
 
+  #블루투스
+  bluetooth_classic: ^0.0.3
+  fluttertoast: ^8.0.9
+  collection: ^1.15.0
+  flutter_lints: ^4.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  flutter_native_splash: ^2.3.10
+  flutter_launcher_icons: ^0.13.1
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/icon.png"
+
+flutter_native_splash:
+  color: "#FFD400" # 배경 색 (노란색)
+  image: assets/images/splash.png
+  branding: null
+  android_gravity: center
+  ios_content_mode: scaleAspectFit
+  fullscreen: true
 
 
 flutter:
@@ -104,6 +125,10 @@ flutter:
     - assets/images/lucky_received.png
     - assets/images/lucky_expired.png
     - assets/images/brand.png
+    - assets/images/splash.png
+    - assets/images/treasurebox.png
+    - assets/images/loading.png
+    - assets/images/background.png
     - assets/animations/firework.json
     - assets/animations/walking.json
     - assets/animations/coin_reward.json

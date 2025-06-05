@@ -6,6 +6,7 @@ import 'package:cashwalk/page/cashtalk/chat_room_screen.dart';
 import 'package:stomp_dart_client/stomp.dart';
 import 'package:stomp_dart_client/stomp_config.dart';
 import 'package:stomp_dart_client/stomp_frame.dart';
+import 'package:cashwalk/services/http_service.dart'; // ✅ 추가
 import 'dart:convert';
 
 class ChatListScreen extends StatefulWidget {
@@ -42,7 +43,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
   Future<void> _fetchChatRooms(String token) async {
     final headers = {'Authorization': 'Bearer $token'};
     final data = await FontService.getJson(
-      'http://10.0.2.2:8080/api/chat/rooms',
+      '${HttpService.baseUrl}/api/chat/rooms', // ✅ 주소 변경
       headers: headers,
     );
 
@@ -52,9 +53,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
   }
 
   void _connectWebSocket(String token) {
+    // ✅ HttpService.baseUrl에서 http:// 제거한 주소 파싱
+    final uri = Uri.parse(HttpService.baseUrl);
+    final wsHost = uri.host;
+    final wsPort = uri.port;
+
     stompClient = StompClient(
       config: StompConfig(
-        url: 'ws://10.0.2.2:8080/ws/chat/websocket?token=$token',
+        url: 'ws://$wsHost:$wsPort/ws/chat/websocket?token=$token', // ✅ WebSocket 주소 구성
         onConnect: _onConnect,
         onWebSocketError: (error) {
           print('❌ WebSocket 에러: $error');
@@ -101,10 +107,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        backgroundColor: Colors.yellow[700],
-        title: const Text('채팅 목록'),
-      ),
       body: ListView.builder(
         itemCount: _chatRooms.length,
         itemBuilder: (context, index) {

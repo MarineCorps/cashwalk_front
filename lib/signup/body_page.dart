@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:cashwalk/utils/jwt_storage.dart';
 import 'package:cashwalk/screen/home_screen.dart';
+import 'package:cashwalk/services/user_service.dart';
 
 class BodyPage extends StatefulWidget {
   final String nickname;
   final String gender;
-  final String birthDate; // yyyy-MM-dd
+  final String birthDate;
   final String region;
 
   const BodyPage({
@@ -39,35 +38,33 @@ class _BodyPageState extends State<BodyPage> {
 
   Future<void> _submitUserInfo() async {
     final token = await JwtStorage.getToken();
-    final url = Uri.parse('http://10.0.2.2:8080/api/users/info');
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('로그인 토큰이 없습니다. 다시 로그인해주세요.')),
+      );
+      return;
+    }
 
-    final body = jsonEncode({
-      "gender": widget.gender,
-      "birthDate": widget.birthDate,
-      "region": widget.region,
-      "height": int.tryParse(_heightController.text.trim()),
-      "weight": int.tryParse(_weightController.text.trim()),
-    });
+    try {
+      await UserService.updateProfileField(
+        token,
+        nickname: widget.nickname,
+        gender: widget.gender,
+        birthDate: widget.birthDate,
+        region: widget.region,
+        height: int.tryParse(_heightController.text.trim()),
+        weight: int.tryParse(_weightController.text.trim()),
+      );
 
-    final response = await http.patch(
-      url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json'
-      },
-      body: body,
-    );
-
-    if (response.statusCode == 200) {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => HomePage()),
             (route) => false,
       );
-    } else {
-      print('❌ 사용자 정보 저장 실패: ${response.statusCode}');
+    } catch (e) {
+      print('❌ 사용자 정보 저장 실패: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('사용자 정보 저장에 실패했습니다.')),
+        const SnackBar(content: Text('사용자 정보 저장에 실패했습니다.')),
       );
     }
   }

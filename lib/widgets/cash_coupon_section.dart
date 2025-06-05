@@ -1,95 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:cashwalk/utils/jwt_storage.dart';
-import 'package:google_fonts/google_fonts.dart'; // ✅ 필기체 폰트 사용을 위해 추가
+import 'package:google_fonts/google_fonts.dart';
+import 'package:cashwalk/services/user_service.dart';
 
-class CashCouponSection extends StatefulWidget {
+class CashCouponSection extends StatelessWidget {
   const CashCouponSection({super.key});
 
   @override
-  State<CashCouponSection> createState() => _CashCouponSectionState();
-}
-
-class _CashCouponSectionState extends State<CashCouponSection> {
-  int _point = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUserPoint(); // ⬅️ 사용자 포인트 불러오기
-  }
-
-  /// ✅ 서버에서 사용자 포인트를 가져오는 함수
-  Future<void> _loadUserPoint() async {
-    try {
-      final token = await JwtStorage.getToken(); // 저장된 JWT 토큰 가져오기
-      final response = await http.get(
-        Uri.parse('http://10.0.2.2:8080/api/users/me'),
-        headers: {'Authorization': 'Bearer $token'},
-      );
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        setState(() {
-          _point = data['point']; // 포인트 값을 상태에 저장
-        });
-      } else {
-        print('포인트 불러오기 실패: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('에러 발생: $e');
-    }
-  }
-
-  /// ✅ UI 구현부
-  @override
   Widget build(BuildContext context) {
+    final int point = UserService.currentUser?.points ?? 0;
+
     return Container(
       height: 120,
-      color: Colors.yellow[700],
+      color: const Color(0xFFFFD400), // ✅ 통일된 노란색 (캐시워크 메인 컬러)
       padding: const EdgeInsets.only(top: 10, left: 15, right: 15, bottom: 5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 🔝 첫 번째 줄: 홈 + 화면잠금 버튼
           Stack(
             alignment: Alignment.center,
             children: [
-              // 가운데 정렬된 "홈"
               const Center(
                 child: Text(
                   '홈',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
-              // 오른쪽 정렬된 잠금 아이콘
               Align(
                 alignment: Alignment.centerRight,
                 child: IconButton(
-                  icon: const Icon(Icons.lock, color: Colors.black87),
+                  icon: const Icon(Icons.lock_outline, color: Colors.black),
                   onPressed: () {
-                    print('화면 잠금 버튼 클릭됨');
+                    print('🔒 화면 잠금 클릭됨');
                   },
                 ),
               ),
             ],
           ),
           const SizedBox(height: 4),
-
-          // 💰 두 번째 줄: 원 안의 필기체 C + 포인트 텍스트, 내 쿠폰함 버튼
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              // ✅ 캐시 포인트
               Row(
                 children: [
-                  // ✅ 필기체 C 아이콘
                   CircleAvatar(
                     radius: 14,
-                    backgroundColor: Colors.black87,
+                    backgroundColor: Colors.black,
                     child: Text(
                       'C',
-                      style: GoogleFonts.dancingScript( // ✅ 필기체 적용
+                      style: GoogleFonts.dancingScript(
                         fontSize: 16,
                         color: Colors.white,
                       ),
@@ -97,7 +56,7 @@ class _CashCouponSectionState extends State<CashCouponSection> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '$_point',
+                    '$point',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -110,18 +69,18 @@ class _CashCouponSectionState extends State<CashCouponSection> {
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
-                  )
+                  ),
                 ],
               ),
 
-              // 🧾 내 쿠폰함 버튼
+              // ✅ 쿠폰함 버튼
               OutlinedButton(
                 onPressed: () {
-                  print('내 쿠폰함 클릭됨');
+                  print('🎟 내 쿠폰함 클릭됨');
                 },
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.black87,
-                  side: const BorderSide(color: Colors.black87),
+                  foregroundColor: Colors.black,
+                  side: const BorderSide(color: Colors.black),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),

@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'body_page.dart';
+import 'package:cashwalk/signup/body_page.dart';
+import 'package:cashwalk/utils/jwt_storage.dart';
+import 'package:cashwalk/services/user_service.dart';
 
 class InformationPage extends StatefulWidget {
   final String nickname;
@@ -144,6 +146,46 @@ class _InformationPageState extends State<InformationPage> {
     );
   }
 
+  Future<void> _submitAndGoNext() async {
+    final token = await JwtStorage.getToken();
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('로그인 토큰이 없습니다. 다시 로그인해주세요.')),
+      );
+      return;
+    }
+
+    final birthStr = '${birthDate!.year.toString().padLeft(4, '0')}-${birthDate!.month.toString().padLeft(2, '0')}-${birthDate!.day.toString().padLeft(2, '0')}';
+
+    try {
+      await UserService.updateProfileField(
+        token,
+        nickname: widget.nickname,
+        gender: gender,
+        birthDate: birthStr,
+        region: region,
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => BodyPage(
+            nickname: widget.nickname,
+            gender: gender!,
+            birthDate: birthStr,
+            region: region!,
+          ),
+        ),
+      );
+    } catch (e) {
+      print('❌ 서버 전송 실패: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('정보 전송 실패. 다시 시도해주세요.')),
+      );
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     String birthText = birthDate != null
@@ -221,21 +263,7 @@ class _InformationPageState extends State<InformationPage> {
               width: double.infinity,
               height: 48,
               child: ElevatedButton(
-                onPressed: isValid
-                    ? () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => BodyPage(
-                        nickname: widget.nickname,
-                        gender: gender!,
-                        birthDate: birthText,
-                        region: region!,
-                      ),
-                    ),
-                  );
-                }
-                    : null,
+                onPressed: isValid ? _submitAndGoNext : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.brown[400],
                   disabledBackgroundColor: Colors.grey[300],

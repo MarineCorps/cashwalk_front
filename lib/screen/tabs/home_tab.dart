@@ -8,6 +8,9 @@ import 'package:cashwalk/widgets/step_display_widget.dart';
 import 'package:cashwalk/widgets/cash_coupon_section.dart';
 import 'package:cashwalk/services/community_service.dart';
 import 'package:cashwalk/page/community/post_detail_widget.dart';
+import 'package:cashwalk/page/healthcare/pushtest.dart';
+import '../../page/healthcare/walk_analyze_page.dart';
+
 class HomeTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -29,32 +32,39 @@ class HomeTab extends StatelessWidget {
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               children: [
-                _buildCategoryButton('팬마음', Icons.favorite, () {}),
-                _buildCategoryButton('건강케어', Icons.local_hospital, () {}),
-                _buildCategoryButton('돈버는퀴즈', Icons.quiz, () {}),
-                _buildCategoryButton('동네상책', Icons.map, () {
+                _buildCategoryButton('팬마음', Icons.favorite, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => WalkAnalyzyPage()));
+                }, Colors.pinkAccent),
+                _buildCategoryButton('건강케어', Icons.local_hospital, () {Navigator.push(context, MaterialPageRoute(builder: (_) => WalkAnalyzyPage()),);}, Colors.orangeAccent,),
+                _buildCategoryButton('돈버라방', Icons.live_tv, () {}, Colors.redAccent),
+                _buildCategoryButton('동네산책', Icons.directions_walk, () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => NeighborhoodWalk()));
-                }),
-                _buildCategoryButton('쇼핑비서', Icons.shopping_bag, () {}),
-                _buildCategoryButton('언니의파우치', Icons.card_giftcard, () {}),
-                _buildCategoryButton('캐시딜', Icons.attach_money, () {
+                }, Colors.blueAccent),
+                _buildCategoryButton('쇼핑비서', Icons.shopping_cart, () {}, Colors.teal),
+
+                _buildCategoryButton('언니의파우치', Icons.card_giftcard, () {}, Colors.deepOrange),
+                _buildCategoryButton('캐시딜', Icons.local_offer, () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => CashDealPage()));
-                }),
-                _buildCategoryButton('트로스트', Icons.psychology, () {}),
-                _buildCategoryButton('모두의챌린지', Icons.emoji_events, () {}),
+                }, Colors.red),
+                _buildCategoryButton('트로스트', Icons.psychology, () {}, Colors.amber),
+                _buildCategoryButton('모두의챌린지', Icons.emoji_events, () {}, Colors.deepOrangeAccent),
                 _buildCategoryButton('러닝크루', Icons.directions_run, () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => RunningCrewPage()));}),
-                _buildCategoryButton('캐시닥', Icons.health_and_safety, () {}),
-                _buildCategoryButton('팀워크', Icons.groups, () {}),
-                _buildCategoryButton('뽑기', Icons.casino, () {}),
-                _buildCategoryButton('돈버는미션', Icons.task, () {}),
-                _buildCategoryButton('캐시리뷰', Icons.rate_review, () {}),
-                _buildCategoryButton('과민보스', Icons.emoji_emotions, () {}),
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => RunningCrewPage()));
+                }, Colors.yellow.shade700),
+
+                _buildCategoryButton('캐시닥', Icons.health_and_safety, () {}, Colors.yellow.shade600),
+                _buildCategoryButton('팀워크', Icons.groups, () {}, Colors.indigo),
+                _buildCategoryButton('뽑기', Icons.casino, () {}, Colors.orange),
+                _buildCategoryButton('돈버는미션', Icons.task, () {}, Colors.blueGrey),
+                _buildCategoryButton('캐시리뷰', Icons.rate_review, () {}, Colors.blue),
+
+                _buildCategoryButton('과민보스', Icons.emoji_emotions, () {}, Colors.green.shade800),
                 _buildCategoryButton('커뮤니티', Icons.forum, () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => CommunityPage()));
-                }),
-                _buildCategoryButton('캐시웨어', Icons.inventory, () {}),
+                }, Colors.orangeAccent),
+                _buildCategoryButton('캐시웨어', Icons.inventory, () {}, Colors.amber.shade700),
               ],
+
             ),
           ),
           // 🟣 친구 초대 배너 이미지
@@ -83,19 +93,20 @@ class HomeTab extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryButton(String title, IconData icon, VoidCallback onTap) {
+  Widget _buildCategoryButton(String title, IconData icon, VoidCallback onTap, Color color) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 28),
+          Icon(icon, size: 28, color: color), // ✅ 컬러 적용
           const SizedBox(height: 4),
           Text(title, style: const TextStyle(fontSize: 11)),
         ],
       ),
     );
   }
+
 
   Widget _buildQuizSection() {
     return Container(
@@ -354,7 +365,7 @@ class AdvertisementWidget extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: Image.network(
-            'https://picsum.photos/250/80',
+            'https://picsum.photos/250/60',
             width: double.infinity,
             fit: BoxFit.cover,
           ),

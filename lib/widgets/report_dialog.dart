@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 Future<String?> showReportDialog(BuildContext context) async {
-  String? selectedReason;
+  String? selectedReason = 'ABUSE'; // 초기 선택값 설정
 
   return showDialog<String>(
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: Text('신고 사유를 선택해주세요'),
+        title: const Text('신고 사유를 선택해주세요'),
         content: StatefulBuilder(
           builder: (context, setState) {
             return Column(
@@ -24,10 +24,10 @@ Future<String?> showReportDialog(BuildContext context) async {
           },
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text('취소')),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('취소')),
           TextButton(
             onPressed: () => Navigator.pop(context, selectedReason),
-            child: Text('신고'),
+            child: const Text('신고'),
           ),
         ],
       );
@@ -35,11 +35,21 @@ Future<String?> showReportDialog(BuildContext context) async {
   );
 }
 
-Widget _buildReasonTile(void Function(VoidCallback) setState, String? selected, String code, String label) {
+Widget _buildReasonTile(
+    void Function(VoidCallback) setState,
+    String? selected,
+    String code,
+    String label,
+    ) {
   return RadioListTile<String>(
     title: Text(label),
     value: code,
     groupValue: selected,
-    onChanged: (value) => setState(() => selected = value),
+    onChanged: (value) {
+      setState(() {
+        selected = value!;
+      });
+    },
+    activeColor: Colors.amber, // ✅ 선택 시 색상 강조
   );
 }

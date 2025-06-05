@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:cashwalk/utils/jwt_storage.dart';
-import 'package:cashwalk/utils/env.dart';
+import 'package:cashwalk/services/http_service.dart'; // ✅ HttpService로 변경
 
 class FavoriteService {
-  static final String baseUrl = '$httpBaseUrl/api/favorites';
+  static const String basePath = '/api/favorites'; // ✅ basePath만 따로 정의
 
   /// 즐겨찾기 전체 목록 조회 (BoardType + PostCategory 포함)
   static Future<List<String>> fetchFavorites() async {
     final jwt = await JwtStorage.getToken();
-    final url = Uri.parse('$baseUrl/me');
+    final url = Uri.parse('${HttpService.baseUrl}$basePath/me');
 
     final response = await http.get(
       url,
@@ -28,7 +28,7 @@ class FavoriteService {
   static Future<void> addFavorite({String? boardType, String? postCategory}) async {
     final jwt = await JwtStorage.getToken();
     final query = boardType != null ? 'boardType=$boardType' : 'postCategory=$postCategory';
-    final url = Uri.parse('$baseUrl?$query');
+    final url = Uri.parse('${HttpService.baseUrl}$basePath?$query');
 
     final response = await http.post(
       url,
@@ -44,7 +44,7 @@ class FavoriteService {
   static Future<void> removeFavorite({String? boardType, String? postCategory}) async {
     final jwt = await JwtStorage.getToken();
     final query = boardType != null ? 'boardType=$boardType' : 'postCategory=$postCategory';
-    final url = Uri.parse('$baseUrl?$query');
+    final url = Uri.parse('${HttpService.baseUrl}$basePath?$query');
 
     final response = await http.delete(
       url,

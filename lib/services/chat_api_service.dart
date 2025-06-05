@@ -85,4 +85,18 @@ class ChatApiService {
       },
     );
   }
+  static Future<List<Map<String, dynamic>>> getLuckyFriends() async {
+    final headers = await _authHeaders();
+    final response = await FontService.getJson(
+      '$httpBaseUrl/api/chat/lucky-friends',
+      headers: headers,
+    );
+
+    if (response is List) {
+      return response.whereType<Map<String, dynamic>>().toList();
+    } else {
+      throw Exception('행운 친구 응답이 List가 아님: $response');
+    }
+  }
+
 }

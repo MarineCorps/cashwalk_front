@@ -9,8 +9,8 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final TextEditingController _controller = TextEditingController(text: 'cashwalker');
-  String nickname = 'cashwalker';
+  final TextEditingController _controller = TextEditingController(); // ✅ 기본값 제거
+  String nickname = '';
 
   @override
   void dispose() {
@@ -47,7 +47,9 @@ class _ProfilePageState extends State<ProfilePage> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                '안녕하세요 $nicknameTrimmed님,\n프로필 사진과 이름을 입력해주세요.',
+                nicknameTrimmed.isNotEmpty
+                    ? '안녕하세요 $nicknameTrimmed님,\n프로필 사진과 이름을 입력해주세요.'
+                    : '닉네임을 입력해주세요.',
                 style: const TextStyle(fontSize: 14, color: Colors.black87),
               ),
             ),
@@ -58,16 +60,20 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Icon(Icons.camera_alt, size: 36, color: Colors.grey[700]),
             ),
             const SizedBox(height: 32),
+
+            // ✅ 닉네임 입력란
             Stack(
               children: [
                 TextField(
                   controller: _controller,
+                  autofocus: true, // ✅ 자동 포커싱
                   onChanged: (value) {
                     setState(() => nickname = value);
                   },
                   maxLength: 20,
                   decoration: const InputDecoration(
-                    labelText: '이름',
+                    labelText: '닉네임',
+                    hintText: '닉네임을 입력해주세요',
                     counterText: '',
                     border: OutlineInputBorder(),
                     filled: true,
@@ -88,7 +94,7 @@ class _ProfilePageState extends State<ProfilePage> {
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                '이름은 20자까지 사용 가능합니다.',
+                '닉네임은 20자까지 입력 가능합니다.',
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ),
@@ -102,7 +108,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => InformationPage(nickname: nickname.trim()),
+                      builder: (_) => InformationPage(nickname: nicknameTrimmed),
                     ),
                   );
                 }

@@ -9,13 +9,25 @@ class UserProfile {
   final String id;
   final String nickname;
   final String inviteCode;
-  final String? profileImageUrl;
+  final String? profileImage;  // ✅ 필드명 수정됨!
+  final int? height;
+  final int? weight;
+  final String? region;
+  final String? gender;
+  final String? birthDate;
+  final int? points; // ✅ 필드명도 totalPoints 아님! points 맞음
 
   UserProfile({
     required this.id,
     required this.nickname,
     required this.inviteCode,
-    this.profileImageUrl,
+    this.profileImage,
+    this.height,
+    this.weight,
+    this.region,
+    this.gender,
+    this.birthDate,
+    this.points,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
@@ -23,10 +35,17 @@ class UserProfile {
       id: json['id'].toString(),
       nickname: json['nickname'] ?? '익명',
       inviteCode: json['inviteCode'] ?? 'UNKNOWN',
-      profileImageUrl: json['profileImageUrl'],
+      profileImage: json['profileImage'], // ✅ 수정
+      height: json['height'],
+      weight: json['weight'],
+      region: json['region'],
+      gender: json['gender'],
+      birthDate: json['birthDate'],
+      points: json['points'], // ✅ 수정
     );
   }
 }
+
 
 /// ✅ 유저 관련 모든 기능을 통합 관리
 class UserService {
@@ -54,8 +73,8 @@ class UserService {
   /// ✅ 서버/카카오/기본 프로필 이미지 우선순위 반환
   static Future<String> getProfileImageUrl() async {
     // 1️⃣ 서버 프로필 먼저
-    if (_cachedUser?.profileImageUrl != null) {
-      return _cachedUser!.profileImageUrl!;
+    if (_cachedUser?.profileImage != null) {
+      return _cachedUser!.profileImage!;
     }
 
     // 2️⃣ 카카오 이미지 (로그인 유지 + 사용자 체크)
@@ -108,6 +127,37 @@ class UserService {
     _cachedKakaoProfileUrl = null;
     _cachedKakaoUserId = null;
   }
+
+
+  static Future<void> updateProfileField(
+      String token, {
+        String? nickname,
+        String? gender,
+        String? birthDate,
+        String? region,
+        int? height,
+        int? weight,
+      }) async {
+    final url = Uri.parse('${HttpService.baseUrl}/api/users/info');
+
+    final body = <String, dynamic>{};
+    if (nickname != null) body['nickname'] = nickname;
+    if (gender != null) body['gender'] = gender;
+    if (birthDate != null) body['birthDate'] = birthDate;
+    if (region != null) body['region'] = region;
+    if (height != null) body['height'] = height;
+    if (weight != null) body['weight'] = weight;
+
+    final response = await HttpService.patchToServer(url, token: token, body: body);
+
+    if (response.statusCode != 200) {
+      print('❌ 사용자 정보 업데이트 실패: ${response.statusCode}');
+      throw Exception('업데이트 실패');
+    }
+
+    print('✅ 사용자 정보 업데이트 성공');
+  }
+
 
 
 }

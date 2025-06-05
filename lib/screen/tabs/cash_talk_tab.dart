@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cashwalk/page/cashtalk/cash_talk_friend.dart';
 import 'package:cashwalk/page/cashtalk/chat_list_screen.dart';
 import 'package:cashwalk/page/cashtalk/ranking_screen.dart';
-import 'package:cashwalk/screen/home_screen.dart'; // ✅ 홈 전체 구조
+import 'package:cashwalk/screen/home_screen.dart';
 
 class CashTalkTab extends StatefulWidget {
   const CashTalkTab({super.key});
@@ -20,22 +20,30 @@ class _CashTalkTabState extends State<CashTalkTab> {
     RankingScreen(),
   ];
 
+  final List<String> _titles = [
+    '친구 목록',
+    '채팅방',
+    '랭킹',
+  ];
+
   void _onTap(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    setState(() => _selectedIndex = index);
   }
 
   @override
   Widget build(BuildContext context) {
+    const Color yellow = Color(0xFFFFD400); // ✅ 캐시워크 대표색
+
     return Scaffold(
+      backgroundColor: Colors.white,
+
       appBar: AppBar(
-        title: const Text('캐시톡'),
-        backgroundColor: Colors.yellow[700],
+        elevation: 0,
+        backgroundColor: yellow, // ✅ 상단 AppBar 색상 통일
+        foregroundColor: Colors.black,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () {
-            // ✅ 실무 방식: 전체 HomePage로 초기화 + index 0 (HomeTab)
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
                 builder: (_) => const HomePage(initialIndex: 0),
@@ -44,17 +52,46 @@ class _CashTalkTabState extends State<CashTalkTab> {
             );
           },
         ),
+        title: Text(
+          _titles[_selectedIndex],
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            letterSpacing: -0.5,
+          ),
+        ),
+        centerTitle: true,
       ),
-      body: _tabs[_selectedIndex],
+
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 250),
+        child: _tabs[_selectedIndex],
+      ),
+
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: yellow, // ✅ 하단 색상도 동일하게
         currentIndex: _selectedIndex,
         onTap: _onTap,
         selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey,
+        unselectedItemColor: Colors.black54,
+        selectedFontSize: 12,
+        unselectedFontSize: 12,
+        showUnselectedLabels: true,
+        type: BottomNavigationBarType.fixed,
+        elevation: 8,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: '친구'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat), label: '채팅'),
-          BottomNavigationBarItem(icon: Icon(Icons.emoji_events), label: '랭킹'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people_alt_outlined),
+            label: '친구',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat_bubble_outline),
+            label: '채팅',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.emoji_events_outlined),
+            label: '랭킹',
+          ),
         ],
       ),
     );

@@ -134,12 +134,12 @@ class _NeighborhoodWalkState extends State<NeighborhoodWalk> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('📍 충청남도 천안시동남구'),
-                Text('최저 8° / 최고 18°'),
+                Text('📍 경기도 용인시 기흥구 동백동'),
+                Text('최저 12° / 최고 29°'),
               ],
             ),
             SizedBox(height: 10),
-            Text('🌙 13.8°C', style: TextStyle(fontSize: 32)),
+            Text('🌙 25°C', style: TextStyle(fontSize: 32)),
             SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -158,7 +158,7 @@ class _NeighborhoodWalkState extends State<NeighborhoodWalk> {
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 16),
       child: Text(
-        '우리 동네 보물찾기!\n산책하면서 숨은 50개시를 찾아보세요.',
+        '우리 동네 보물찾기!\n산책하면서 숨은 10개시를 찾아보세요.',
         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         textAlign: TextAlign.center,
       ),

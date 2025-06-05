@@ -71,7 +71,7 @@ class _LuckyLotteryDialogState extends State<LuckyLotteryDialog> {
             const SizedBox(height: 16),
             Scratcher(
               brushSize: 40,
-              threshold: 97,
+              threshold: 99,
               color: Colors.grey,
               onChange: (_) {},
               onThreshold: () async {
