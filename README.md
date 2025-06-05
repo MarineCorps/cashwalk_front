@@ -46,7 +46,7 @@ Flutter 기반으로 제작된 CashWalk 클론 앱입니다. 걷기 활동 기�
 
 <div>
 <img src="./skills/Dart.png" width="80">
-<img src="./skills/Flutter.png" width="80">
+<img src="./skills/Flutter.png" width="40">
 <img src="./skills/AndroidStudio.png" width="80">
 <img src="./skills/JWT.png" width="80">
 </div>
